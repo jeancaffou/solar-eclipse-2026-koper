@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.idea/
+/promenada*.png
+*.log
+.DS_Store

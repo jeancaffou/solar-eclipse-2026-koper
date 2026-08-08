@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Interactive, true-scale simulation of the 12 August 2026 partial solar eclipse from Koper promenade, Slovenia."
+    />
+    <meta name="theme-color" content="#091210" />
+    <title>Koper Eclipse · 12 August 2026</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <main class="simulator" aria-label="Koper solar eclipse simulator">
+        <canvas
+          id="scene"
+          class="scene"
+          width="1080"
+          height="1920"
+          aria-label="View from Koper promenade with the simulated Sun and Moon"
+        ></canvas>
+        <div class="grain" aria-hidden="true"></div>
+        <div class="edge-shade" aria-hidden="true"></div>
+
+        <header class="masthead">
+          <div class="eyebrow"><span class="signal-dot"></span> <span id="location-label">Koper · Slovenia</span></div>
+          <h1 id="title-label">Sunset<br />in eclipse</h1>
+          <p id="header-date-label">12 August 2026</p>
+        </header>
+
+        <div class="top-actions">
+          <label class="language-switcher" for="language-select">
+            <span id="language-label">Language</span>
+            <select id="language-select" aria-label="Language">
+              <option value="en">EN</option>
+              <option value="sl">SL</option>
+            </select>
+          </label>
+          <button class="method-button" id="open-method" type="button" aria-label="Open simulation details">
+            <span id="method-label">Method</span>
+            <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+
+        <section class="solar-card" id="solar-card" aria-label="Magnified solar disc">
+          <div class="card-heading">
+            <span id="solar-view-label">Solar view</span>
+            <span class="scale-pill">15×</span>
+          </div>
+          <canvas id="solar-detail" width="320" height="320" aria-hidden="true"></canvas>
+          <div class="solar-caption">
+            <span id="detail-status">Above horizon</span>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="Live eclipse values">
+          <div class="phase-line">
+            <span class="phase-dot"></span>
+            <span id="phase">Partial eclipse</span>
+          </div>
+          <dl>
+            <div>
+              <dt id="sun-covered-label">Sun covered</dt>
+              <dd id="coverage">0.0%</dd>
+            </div>
+            <div>
+              <dt id="magnitude-label">Magnitude</dt>
+              <dd id="magnitude">0.000</dd>
+            </div>
+            <div>
+              <dt id="sun-altitude-label">Sun altitude</dt>
+              <dd id="altitude">0.00°</dd>
+            </div>
+            <div>
+              <dt id="azimuth-label">Azimuth</dt>
+              <dd id="azimuth">0.00°</dd>
+            </div>
+            <div>
+              <dt id="disc-ratio-label">Moon / Sun</dt>
+              <dd id="disc-ratio">1.000×</dd>
+            </div>
+          </dl>
+          <div class="true-scale-key"><i></i> <span id="true-scale-label">Main view: true angular scale</span></div>
+        </section>
+
+        <div class="signature" aria-label="Simulation made by jeancaffou">
+          <span id="signature-label">Simulation made by</span>
+          <a href="https://www.instagram.com/jeancaffou/" target="_blank" rel="noreferrer">@jeancaffou</a>
+          <a class="signature-repo" href="https://github.com/jeancaffou/solar-eclipse-2026-koper" target="_blank" rel="noreferrer">GitHub ↗</a>
+        </div>
+
+        <section class="controls" aria-label="Simulation time controls" id="simulation-controls">
+          <div class="time-row">
+            <button id="play" class="play-button" type="button" aria-label="Play simulation">
+              <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5.2v13.6L19 12 8 5.2Z"></path>
+              </svg>
+              <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 5h4v14H7zM14 5h4v14h-4z"></path>
+              </svg>
+            </button>
+            <div class="clock">
+              <time id="local-time" datetime="2026-08-12T20:10:00+02:00">20:10:00</time>
+              <span id="zone">CEST</span>
+            </div>
+            <div class="local-date" id="local-date">Wed · 12 Aug</div>
+            <label class="playback-speed" for="playback-speed">
+              <span id="speed-label">Speed</span>
+              <select id="playback-speed" aria-label="Playback speed">
+                <option value="1">1×</option>
+                <option value="2">2×</option>
+                <option value="4">4×</option>
+                <option value="8" selected>8×</option>
+                <option value="16">16×</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="timeline-wrap">
+            <input
+              id="timeline"
+              type="range"
+              min="0"
+              max="7500"
+              step="1"
+              value="3600"
+              aria-label="Local simulation time"
+            />
+            <div class="timeline-markers" aria-hidden="true">
+              <i data-marker="partialBegin"></i>
+              <i data-marker="sunset"></i>
+              <i data-marker="peak"></i>
+              <i data-marker="partialEnd"></i>
+            </div>
+          </div>
+
+          <div class="event-jumps" id="event-jumps" aria-label="Jump to event">
+            <button type="button" data-jump="partialBegin">
+              <span>C1</span><b id="c1-time">19:26</b>
+            </button>
+            <button type="button" data-jump="sunset">
+              <span id="sunset-label">Sunset</span><b id="sunset-time">20:17</b>
+            </button>
+            <button type="button" data-jump="peak">
+              <span id="peak-label">Peak*</span><b id="peak-time">20:18</b>
+            </button>
+            <button type="button" data-jump="partialEnd">
+              <span>C4*</span><b id="c4-time">21:08</b>
+            </button>
+          </div>
+
+          <div class="control-foot">
+            <span id="below-horizon-label">* below the sea horizon</span>
+            <span id="photo-credit-label">Photo: Google Maps · Apr 2014</span>
+          </div>
+        </section>
+
+        <dialog id="method-dialog" class="method-dialog">
+          <form method="dialog">
+            <button class="close-button" value="close" aria-label="Close details">×</button>
+            <p class="dialog-eyebrow" id="method-eyebrow">How this simulation works</p>
+            <h2 id="method-title">Position first.<br />Atmosphere second.</h2>
+            <p id="method-description">
+              Sun and Moon coordinates are topocentric for
+              <strong>45.5455229° N, 13.7234669° E</strong>. Their circular limbs are projected
+              through the reference camera at the real apparent angular sizes. The scene disc is
+              only about 9–10 pixels wide; the inset enlarges both bodies by exactly the same 15×.
+            </p>
+            <dl class="method-facts">
+              <div><dt id="view-fact-label">View</dt><dd id="view-fact-value">279.8199° true · 90° vertical FOV</dd></div>
+              <div><dt id="first-contact-fact-label">First contact</dt><dd id="first-contact-fact-value">19:26:46 CEST</dd></div>
+              <div><dt id="sunset-fact-label">Sunset</dt><dd id="sunset-fact-value">20:17:41 CEST</dd></div>
+              <div><dt id="peak-fact-label">Geometric peak</dt><dd id="peak-fact-value">20:18:47 CEST · below horizon</dd></div>
+            </dl>
+            <p class="method-note" id="method-note">
+              Motion uses Astronomy Engine 2.1.19 (approximately ±1 arcminute). Event labels are
+              pinned to USNO/NASA calculations. Near-horizon refraction depends on actual weather;
+              photo darkening is an illustrative exposure response, not a weather forecast.
+            </p>
+            <nav class="source-links" aria-label="Scientific sources">
+              <a href="https://aa.usno.navy.mil/data/SolarEclipses" target="_blank" rel="noreferrer">USNO</a>
+              <a href="https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/" target="_blank" rel="noreferrer">NASA</a>
+              <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noreferrer">Astronomy Engine</a>
+            </nav>
+            <p class="safety-note" id="safety-note">Use ISO 12312-2 eclipse glasses. Never look directly at the Sun.</p>
+          </form>
+        </dialog>
+
+        <noscript id="noscript-label">This simulation needs JavaScript enabled.</noscript>
+      </main>
+      <p class="desktop-hint" id="desktop-hint">Drag the timeline · space toggles playback · arrow keys nudge time</p>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
